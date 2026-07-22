@@ -1,6 +1,7 @@
 import { TeacherService } from '../services/teacherService.js';
 
 let activeTab = 'dash';
+let activeQuestionType = 'MCQ';
 
 export function renderTeacherPortal() {
   const content = document.getElementById('teacher-content');
@@ -111,9 +112,14 @@ function renderCreateExamView() {
   const code = TeacherService.generateExamCode();
   return `
     <div class="max-w-4xl mx-auto space-y-6">
-      <div>
-        <h1 class="text-2xl font-bold text-on-surface">Create New Examination</h1>
-        <p class="text-xs text-on-surface-variant">Configure assessment parameters, proctoring options, and add MCQ or Coding questions.</p>
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-2xl font-bold text-on-surface">Create New Examination</h1>
+          <p class="text-xs text-on-surface-variant">Configure assessment parameters, proctoring options, and add MCQ or Coding questions.</p>
+        </div>
+        <button type="button" onclick="openAddQuestionModal()" class="bg-primary text-on-primary px-4 py-2.5 rounded-xl font-semibold text-xs glow-button flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-sm">add_circle</span> Add Question
+        </button>
       </div>
 
       <form onsubmit="handleCreateExam(event)" class="bg-surface-container-lowest border border-outline-variant/50 rounded-2xl p-6 md:p-8 ambient-shadow space-y-6">
@@ -172,6 +178,32 @@ function renderCreateExamView() {
           </div>
         </div>
 
+        <!-- Questions Section Summary -->
+        <div class="pt-4 border-t border-outline-variant/30 space-y-3">
+          <div class="flex justify-between items-center">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-on-surface">Exam Questions (2 Configured)</h3>
+            <button type="button" onclick="openAddQuestionModal()" class="text-xs font-bold text-primary hover:underline">+ Add Another Question</button>
+          </div>
+
+          <div class="space-y-2 text-xs">
+            <div class="bg-surface-container-low p-3 rounded-xl flex justify-between items-center border border-outline-variant/30">
+              <div>
+                <span class="font-bold text-on-surface">1. What is the average time complexity of insertion in a Hash Map?</span>
+                <p class="text-on-surface-variant text-[11px]">MCQ • Correct Answer: O(1)</p>
+              </div>
+              <span class="font-mono font-bold text-primary">40 Marks</span>
+            </div>
+
+            <div class="bg-surface-container-low p-3 rounded-xl flex justify-between items-center border border-outline-variant/30">
+              <div>
+                <span class="font-bold text-on-surface">2. Two Sum Algorithm Problem</span>
+                <p class="text-on-surface-variant text-[11px]">Coding Problem • 3 Test Cases Attached</p>
+              </div>
+              <span class="font-mono font-bold text-primary">60 Marks</span>
+            </div>
+          </div>
+        </div>
+
         <!-- Actions -->
         <div class="flex gap-4 pt-4 border-t border-outline-variant/30">
           <button type="button" onclick="switchTab('dash')" class="flex-1 border border-outline-variant/60 py-3 rounded-xl font-semibold text-xs hover:bg-surface-container">
@@ -194,10 +226,10 @@ function renderQuestionBankView() {
       <div class="flex justify-between items-center">
         <div>
           <h1 class="text-2xl font-bold text-on-surface">Question Bank Repository</h1>
-          <p class="text-xs text-on-surface-variant">Reuse, search, and import verified questions across exams.</p>
+          <p class="text-xs text-on-surface-variant">Reuse, search, and author questions across exams.</p>
         </div>
-        <button onclick="alert('Question Bank import wizard loaded!')" class="bg-primary/10 text-primary border border-primary/30 px-4 py-2 rounded-xl font-semibold text-xs hover:bg-primary/20">
-          Import CSV / JSON
+        <button onclick="openAddQuestionModal()" class="bg-primary text-on-primary px-4 py-2.5 rounded-xl font-semibold text-xs glow-button flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-sm">add_circle</span> Create New Question
         </button>
       </div>
 
@@ -217,7 +249,7 @@ function renderQuestionBankView() {
       </div>
 
       <!-- Questions List -->
-      <div class="space-y-3">
+      <div class="space-y-3" id="qb-questions-list">
         ${questions.map(q => `
           <div class="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-5 ambient-shadow space-y-2">
             <div class="flex justify-between items-start">
@@ -228,7 +260,7 @@ function renderQuestionBankView() {
             <p class="text-xs text-on-surface-variant">${q.explanation || q.statement || ''}</p>
             <div class="pt-2 flex justify-between items-center text-xs">
               <span class="text-on-surface-variant font-mono">${q.subject} / ${q.topic}</span>
-              <button onclick="alert('Question added to active exam builder!')" class="text-primary font-semibold hover:underline">Reuse in Exam +</button>
+              <button onclick="alert('Question added to active exam!')" class="text-primary font-semibold hover:underline">Reuse in Exam +</button>
             </div>
           </div>
         `).join('')}
@@ -406,6 +438,89 @@ window.downloadCSVReport = function() {
   a.href = url;
   a.download = 'CodeTest_Exam_Results_2026.csv';
   a.click();
+};
+
+window.openAddQuestionModal = function() {
+  const modal = document.getElementById('add-question-modal');
+  if (modal) modal.classList.remove('hidden');
+};
+
+window.closeAddQuestionModal = function() {
+  const modal = document.getElementById('add-question-modal');
+  if (modal) modal.classList.add('hidden');
+};
+
+window.switchQuestionTypeForm = function(type) {
+  activeQuestionType = type;
+  const mcqBtn = document.getElementById('qtype-btn-mcq');
+  const codingBtn = document.getElementById('qtype-btn-coding');
+  const mcqFields = document.getElementById('qform-mcq-fields');
+  const codingFields = document.getElementById('qform-coding-fields');
+
+  if (type === 'CODING') {
+    codingBtn.className = "flex-1 py-2 rounded-lg text-xs font-semibold transition-all bg-surface-container-lowest text-primary shadow-sm";
+    mcqBtn.className = "flex-1 py-2 rounded-lg text-xs font-semibold transition-all text-on-surface-variant hover:text-on-surface";
+    codingFields.classList.remove('hidden');
+    mcqFields.classList.add('hidden');
+  } else {
+    mcqBtn.className = "flex-1 py-2 rounded-lg text-xs font-semibold transition-all bg-surface-container-lowest text-primary shadow-sm";
+    codingBtn.className = "flex-1 py-2 rounded-lg text-xs font-semibold transition-all text-on-surface-variant hover:text-on-surface";
+    mcqFields.classList.remove('hidden');
+    codingFields.classList.add('hidden');
+  }
+};
+
+window.handleSaveNewQuestion = function(e) {
+  e.preventDefault();
+
+  if (activeQuestionType === 'MCQ') {
+    const prompt = document.getElementById('q-mcq-prompt').value;
+    const opt0 = document.getElementById('q-opt-0').value;
+    const opt1 = document.getElementById('q-opt-1').value;
+    const opt2 = document.getElementById('q-opt-2').value;
+    const opt3 = document.getElementById('q-opt-3').value;
+    const correctIdx = parseInt(document.getElementById('q-correct-idx').value);
+    const marks = parseInt(document.getElementById('q-mcq-marks').value);
+    const explanation = document.getElementById('q-mcq-explanation').value;
+
+    TeacherService.saveQuestionToBank({
+      type: 'MCQ',
+      subject: 'Data Structures',
+      topic: 'General',
+      difficulty: 'Easy',
+      marks,
+      prompt,
+      options: [opt0, opt1, opt2, opt3],
+      correctAnswer: correctIdx,
+      explanation
+    });
+  } else {
+    const title = document.getElementById('q-code-title').value;
+    const statement = document.getElementById('q-code-statement').value;
+    const constraints = document.getElementById('q-code-constraints').value;
+    const pubIn = document.getElementById('q-pub-input').value;
+    const pubOut = document.getElementById('q-pub-output').value;
+    const hidIn = document.getElementById('q-hid-input').value;
+    const hidOut = document.getElementById('q-hid-output').value;
+    const marks = parseInt(document.getElementById('q-code-marks').value);
+
+    TeacherService.saveQuestionToBank({
+      type: 'CODING',
+      subject: 'Algorithms',
+      topic: 'Logic',
+      difficulty: 'Medium',
+      marks,
+      title,
+      statement,
+      constraints,
+      publicTestCases: [{ input: pubIn, output: pubOut, weight: 20 }],
+      hiddenTestCases: [{ input: hidIn, output: hidOut, weight: 40 }]
+    });
+  }
+
+  alert('Question created & added to Question Bank / Exam successfully!');
+  window.closeAddQuestionModal();
+  renderTeacherPortal();
 };
 
 window.addEventListener('DOMContentLoaded', renderTeacherPortal);

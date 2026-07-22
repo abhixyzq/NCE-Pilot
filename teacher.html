@@ -50,19 +50,25 @@
     <div class="flex items-center gap-3">
       <a href="index.html" class="flex items-center gap-2 cursor-pointer">
         <span class="material-symbols-outlined text-primary text-2xl">school</span>
-        <span class="font-bold text-lg text-primary tracking-tight">CodeTest Teacher Portal</span>
+        <span class="font-bold text-lg text-primary tracking-tight">CodeTest Faculty Console</span>
       </a>
     </div>
 
     <div class="flex items-center gap-4">
-      <div class="text-right hidden sm:block">
-        <p class="font-semibold text-xs text-on-surface">Prof. Sarah Jenkins</p>
-        <p class="text-[11px] text-on-surface-variant">Computer Science Dept</p>
+      <button onclick="openAddQuestionModal()" class="bg-primary/10 text-primary border border-primary/30 px-3.5 py-1.5 rounded-xl font-semibold text-xs hover:bg-primary/20 transition-all flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-sm">add_circle</span> + Add Question
+      </button>
+
+      <div class="flex items-center gap-3 pl-3 border-l border-outline-variant/40">
+        <div class="text-right hidden sm:block">
+          <p class="font-semibold text-xs text-on-surface">Prof. Sarah Jenkins</p>
+          <p class="text-[11px] text-on-surface-variant font-mono">Faculty • Computer Science</p>
+        </div>
+        <div class="w-9 h-9 rounded-full border-2 border-primary bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-xs">
+          SJ
+        </div>
+        <a href="auth.html" class="text-xs text-on-surface-variant hover:text-primary font-medium ml-2">Sign Out</a>
       </div>
-      <div class="w-9 h-9 rounded-full border-2 border-primary bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-xs">
-        SJ
-      </div>
-      <a href="auth.html" class="text-xs text-on-surface-variant hover:text-primary font-medium ml-2">Sign Out</a>
     </div>
   </header>
 
@@ -72,7 +78,7 @@
       <div class="space-y-1">
         <button id="nav-dash" onclick="switchTab('dash')" class="w-full text-left bg-primary-container text-on-primary-container rounded-xl px-4 py-2.5 flex items-center gap-3 text-xs font-semibold">
           <span class="material-symbols-outlined text-lg">dashboard</span>
-          Dashboard Overview
+          Overview & Exams
         </button>
         <button id="nav-create" onclick="switchTab('create')" class="w-full text-left text-on-surface-variant hover:bg-surface-container-high rounded-xl px-4 py-2.5 flex items-center gap-3 text-xs font-medium transition-all">
           <span class="material-symbols-outlined text-lg">add_circle</span>
@@ -85,19 +91,151 @@
         <button id="nav-review" onclick="switchTab('review')" class="w-full text-left text-on-surface-variant hover:bg-surface-container-high rounded-xl px-4 py-2.5 flex items-center gap-3 text-xs font-medium transition-all">
           <span class="material-symbols-outlined text-lg">rate_review</span>
           Manual Review Queue
-          <span class="ml-auto bg-amber-500 text-white font-bold text-[10px] px-2 py-0.5 rounded-full">1</span>
         </button>
         <button id="nav-analytics" onclick="switchTab('analytics')" class="w-full text-left text-on-surface-variant hover:bg-surface-container-high rounded-xl px-4 py-2.5 flex items-center gap-3 text-xs font-medium transition-all">
           <span class="material-symbols-outlined text-lg">analytics</span>
-          Results & Analytics
+          Results & CSV Export
         </button>
+      </div>
+
+      <div class="pt-4 border-t border-outline-variant/30 space-y-1">
+        <a href="dashboard.html" class="w-full text-left text-on-surface-variant hover:bg-surface-container-high rounded-xl px-4 py-2.5 flex items-center gap-3 text-xs font-medium transition-all">
+          <span class="material-symbols-outlined text-lg">dashboard</span>
+          Student View
+        </a>
       </div>
     </aside>
 
-    <!-- Main Dynamic Content Container -->
+    <!-- Main Content -->
     <main id="teacher-content" class="flex-1 p-6 md:p-8 max-w-7xl mx-auto space-y-8 overflow-y-auto">
       <!-- Injected by JavaScript -->
     </main>
+  </div>
+
+  <!-- Interactive Add Question Builder Modal -->
+  <div id="add-question-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-3xl p-6 md:p-8 max-w-2xl w-full space-y-6 ambient-shadow-lg max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b border-outline-variant/30 pb-3">
+        <div>
+          <h2 class="text-xl font-bold text-on-surface">Author New Question</h2>
+          <p class="text-xs text-on-surface-variant">Create MCQ options or Coding problems with test cases.</p>
+        </div>
+        <button onclick="closeAddQuestionModal()" class="text-on-surface-variant hover:text-on-surface p-1 rounded-lg">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <!-- Question Type Switcher -->
+      <div class="flex p-1 bg-surface-container-high rounded-xl">
+        <button id="qtype-btn-mcq" onclick="switchQuestionTypeForm('MCQ')" class="flex-1 py-2 rounded-lg text-xs font-semibold transition-all bg-surface-container-lowest text-primary shadow-sm">
+          Multiple Choice (MCQ)
+        </button>
+        <button id="qtype-btn-coding" onclick="switchQuestionTypeForm('CODING')" class="flex-1 py-2 rounded-lg text-xs font-semibold transition-all text-on-surface-variant hover:text-on-surface">
+          Coding Problem
+        </button>
+      </div>
+
+      <form onsubmit="handleSaveNewQuestion(event)" class="space-y-4">
+        <!-- MCQ Fields -->
+        <div id="qform-mcq-fields" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-on-surface mb-1">Question Prompt / Statement</label>
+            <textarea id="q-mcq-prompt" required rows="3" class="w-full px-3.5 py-2.5 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs outline-none focus:border-primary" placeholder="Enter question prompt... e.g. What is the time complexity of binary search?"></textarea>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-on-surface mb-1">Option 1</label>
+              <input type="text" id="q-opt-0" required value="O(1)" class="w-full px-3.5 py-2 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs outline-none focus:border-primary"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-on-surface mb-1">Option 2</label>
+              <input type="text" id="q-opt-1" required value="O(log N)" class="w-full px-3.5 py-2 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs outline-none focus:border-primary"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-on-surface mb-1">Option 3</label>
+              <input type="text" id="q-opt-2" required value="O(N)" class="w-full px-3.5 py-2 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs outline-none focus:border-primary"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-on-surface mb-1">Option 4</label>
+              <input type="text" id="q-opt-3" required value="O(N^2)" class="w-full px-3.5 py-2 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs outline-none focus:border-primary"/>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-on-surface mb-1">Correct Option</label>
+              <select id="q-correct-idx" class="w-full px-3.5 py-2.5 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs font-bold text-primary outline-none">
+                <option value="0">Option 1</option>
+                <option value="1" selected>Option 2</option>
+                <option value="2">Option 3</option>
+                <option value="3">Option 4</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-on-surface mb-1">Marks</label>
+              <input type="number" id="q-mcq-marks" required value="10" class="w-full px-3.5 py-2.5 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs outline-none focus:border-primary"/>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-on-surface mb-1">Explanation (Optional)</label>
+            <input type="text" id="q-mcq-explanation" value="Binary search divides the search space in half at each step." class="w-full px-3.5 py-2 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs outline-none focus:border-primary"/>
+          </div>
+        </div>
+
+        <!-- Coding Fields -->
+        <div id="qform-coding-fields" class="space-y-4 hidden">
+          <div>
+            <label class="block text-xs font-bold text-on-surface mb-1">Problem Title</label>
+            <input type="text" id="q-code-title" value="Reverse String Algorithm" class="w-full px-3.5 py-2.5 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs outline-none focus:border-primary"/>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-on-surface mb-1">Problem Statement</label>
+            <textarea id="q-code-statement" rows="3" class="w-full px-3.5 py-2.5 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs outline-none focus:border-primary">Write a function that reverses an array of characters in-place with O(1) extra memory.</textarea>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-on-surface mb-1">Constraints</label>
+              <input type="text" id="q-code-constraints" value="1 <= s.length <= 10^5" class="w-full px-3.5 py-2 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs outline-none focus:border-primary"/>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-on-surface mb-1">Marks</label>
+              <input type="number" id="q-code-marks" value="50" class="w-full px-3.5 py-2.5 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs outline-none focus:border-primary"/>
+            </div>
+          </div>
+
+          <!-- Public Test Case -->
+          <div class="p-3 bg-surface-container-low border border-outline-variant/40 rounded-xl space-y-2">
+            <span class="text-xs font-bold text-primary">Public Test Case (Visible to Students)</span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <input type="text" id="q-pub-input" placeholder="Input: s = ['h','e','l','l','o']" value="s = ['h','e','l','l','o']" class="px-3 py-1.5 bg-surface border border-outline-variant/60 rounded-lg text-xs"/>
+              <input type="text" id="q-pub-output" placeholder="Output: ['o','l','l','e','h']" value="['o','l','l','e','h']" class="px-3 py-1.5 bg-surface border border-outline-variant/60 rounded-lg text-xs"/>
+            </div>
+          </div>
+
+          <!-- Hidden Test Case -->
+          <div class="p-3 bg-surface-container-low border border-outline-variant/40 rounded-xl space-y-2">
+            <span class="text-xs font-bold text-amber-700">Hidden Test Case (Auto-Evaluation)</span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <input type="text" id="q-hid-input" placeholder="Input: s = ['H','a','n','n','a','h']" value="s = ['H','a','n','n','a','h']" class="px-3 py-1.5 bg-surface border border-outline-variant/60 rounded-lg text-xs"/>
+              <input type="text" id="q-hid-output" placeholder="Output: ['h','a','n','n','a','H']" value="['h','a','n','n','a','H']" class="px-3 py-1.5 bg-surface border border-outline-variant/60 rounded-lg text-xs"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-3 pt-4 border-t border-outline-variant/30">
+          <button type="button" onclick="closeAddQuestionModal()" class="flex-1 border border-outline-variant/60 py-3 rounded-xl font-semibold text-xs hover:bg-surface-container">
+            Cancel
+          </button>
+          <button type="submit" class="flex-1 bg-primary text-on-primary py-3 rounded-xl font-semibold text-xs glow-button shadow-md">
+            Save Question
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <script type="module" src="/src/views/teacher.js"></script>
