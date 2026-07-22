@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Oversight Control Panel | CodeTest Pro</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#004ac6",
+            "primary-container": "#2563eb",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#eeefff",
+            "secondary": "#006e2f",
+            "tertiary": "#784b00",
+            "surface": "#f9f9ff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f1f3ff",
+            "surface-container-high": "#e1e8fd",
+            "on-surface": "#141b2b",
+            "on-surface-variant": "#434655",
+            "outline-variant": "#c3c6d7",
+            "background": "#f9f9ff"
+          },
+          fontFamily: { sans: ["Inter", "sans-serif"], mono: ["JetBrains Mono", "monospace"] }
+        }
+      }
+    }
+  </script>
+  <style>
+    .ambient-shadow { box-shadow: 0 16px 32px -12px rgba(0, 0, 0, 0.04), 0 4px 8px -2px rgba(0, 0, 0, 0.02); }
+    .ambient-shadow-lg { box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.08), 0 8px 16px -4px rgba(0, 0, 0, 0.03); }
+    .glow-button { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .glow-button:hover { box-shadow: 0 0 24px rgba(37, 99, 235, 0.35); transform: translateY(-1px); }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; display: inline-block; vertical-align: middle; }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- TopAppBar -->
+  <header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/30 shadow-sm flex justify-between items-center px-4 md:px-12 py-3">
+    <div class="flex items-center gap-3">
+      <a href="index.html" class="flex items-center gap-2 cursor-pointer">
+        <span class="material-symbols-outlined text-primary text-2xl">admin_panel_settings</span>
+        <span class="font-bold text-lg text-primary tracking-tight">CodeTest Admin Console</span>
+      </a>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <div class="text-right hidden sm:block">
+        <p class="font-semibold text-xs text-on-surface">System Administrator</p>
+        <p class="text-[11px] text-on-surface-variant font-mono">Uptime 99.99%</p>
+      </div>
+      <div class="w-9 h-9 rounded-full border-2 border-primary bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-xs">
+        SA
+      </div>
+      <a href="auth.html" class="text-xs text-on-surface-variant hover:text-primary font-medium ml-2">Sign Out</a>
+    </div>
+  </header>
+
+  <div class="flex pt-16 min-h-screen">
+    <!-- Sidebar Navigation -->
+    <aside class="w-64 fixed md:sticky top-16 left-0 h-[calc(100vh-64px)] bg-surface border-r border-outline-variant/30 flex flex-col justify-between p-4 z-40">
+      <div class="space-y-1">
+        <button id="admin-nav-dash" onclick="switchAdminTab('dash')" class="w-full text-left bg-primary-container text-on-primary-container rounded-xl px-4 py-2.5 flex items-center gap-3 text-xs font-semibold">
+          <span class="material-symbols-outlined text-lg">dashboard</span>
+          System Overview
+        </button>
+        <button id="admin-nav-teachers" onclick="switchAdminTab('teachers')" class="w-full text-left text-on-surface-variant hover:bg-surface-container-high rounded-xl px-4 py-2.5 flex items-center gap-3 text-xs font-medium transition-all">
+          <span class="material-symbols-outlined text-lg">school</span>
+          Manage Teachers
+        </button>
+        <button id="admin-nav-students" onclick="switchAdminTab('students')" class="w-full text-left text-on-surface-variant hover:bg-surface-container-high rounded-xl px-4 py-2.5 flex items-center gap-3 text-xs font-medium transition-all">
+          <span class="material-symbols-outlined text-lg">group</span>
+          Manage Students
+        </button>
+        <button id="admin-nav-depts" onclick="switchAdminTab('depts')" class="w-full text-left text-on-surface-variant hover:bg-surface-container-high rounded-xl px-4 py-2.5 flex items-center gap-3 text-xs font-medium transition-all">
+          <span class="material-symbols-outlined text-lg">domain</span>
+          Departments & Subjects
+        </button>
+        <button id="admin-nav-logs" onclick="switchAdminTab('logs')" class="w-full text-left text-on-surface-variant hover:bg-surface-container-high rounded-xl px-4 py-2.5 flex items-center gap-3 text-xs font-medium transition-all">
+          <span class="material-symbols-outlined text-lg">description</span>
+          Audit Logs
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main id="admin-content" class="flex-1 p-6 md:p-8 max-w-7xl mx-auto space-y-8 overflow-y-auto">
+      <!-- Injected by JavaScript -->
+    </main>
+  </div>
+
+  <script type="module" src="/src/views/admin.js"></script>
+</body>
+</html>
