@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CodeTest Pro | Master the Code. Land the Job.</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#004ac6",
+            "primary-container": "#2563eb",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#eeefff",
+            "primary-fixed": "#dbe1ff",
+            "primary-fixed-dim": "#b4c5ff",
+            "secondary": "#006e2f",
+            "secondary-container": "#6bff8f",
+            "secondary-fixed": "#6bff8f",
+            "secondary-fixed-dim": "#4ae176",
+            "on-secondary": "#ffffff",
+            "on-secondary-container": "#007432",
+            "tertiary": "#784b00",
+            "tertiary-container": "#996100",
+            "surface": "#f9f9ff",
+            "surface-dim": "#d3daef",
+            "surface-bright": "#f9f9ff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f1f3ff",
+            "surface-container": "#e9edff",
+            "surface-container-high": "#e1e8fd",
+            "surface-container-highest": "#dce2f7",
+            "surface-variant": "#dce2f7",
+            "on-surface": "#141b2b",
+            "on-surface-variant": "#434655",
+            "inverse-surface": "#293040",
+            "inverse-on-surface": "#edf0ff",
+            "outline": "#737686",
+            "outline-variant": "#c3c6d7",
+            "background": "#f9f9ff",
+            "on-background": "#141b2b"
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+            mono: ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .glass-nav { backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+    .ambient-shadow { box-shadow: 0 16px 32px -12px rgba(0, 0, 0, 0.04), 0 4px 8px -2px rgba(0, 0, 0, 0.02); }
+    .ambient-shadow-lg { box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.08), 0 8px 16px -4px rgba(0, 0, 0, 0.03); }
+    .code-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+    .glow-button { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .glow-button:hover { box-shadow: 0 0 24px rgba(37, 99, 235, 0.35); transform: translateY(-1px); }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; display: inline-block; vertical-align: middle; }
+    .syn-keyword { color: #c678dd; font-weight: 600; }
+    .syn-func { color: #61afef; font-weight: 500; }
+    .syn-comment { color: #5c6370; font-style: italic; }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- TopAppBar Navigation -->
+  <nav class="fixed top-0 w-full z-50 bg-surface/80 glass-nav border-b border-outline-variant/30 flex justify-between items-center px-6 md:px-12 py-4">
+    <a href="index.html" class="flex items-center gap-2 cursor-pointer active:opacity-70">
+      <span class="material-symbols-outlined text-primary text-3xl">terminal</span>
+      <span class="font-sans text-2xl font-bold text-primary tracking-tight">CodeTest</span>
+    </a>
+
+    <div class="hidden md:flex gap-8 items-center">
+      <a class="text-on-surface-variant font-medium hover:text-primary transition-colors text-sm" href="#features">Features</a>
+      <a class="text-on-surface-variant font-medium hover:text-primary transition-colors text-sm" href="#pricing">Pricing</a>
+      <a class="text-on-surface-variant font-medium hover:text-primary transition-colors text-sm" href="dashboard.html">Student Dashboard</a>
+      <a class="text-on-surface-variant font-medium hover:text-primary transition-colors text-sm" href="editor.html">IDE Playground</a>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <a href="auth.html" class="border border-outline/50 text-on-surface px-4 py-2 rounded-lg text-sm font-medium hover:bg-surface-container-low transition-all">
+        Sign In
+      </a>
+      <a href="auth.html" class="bg-primary text-on-primary px-5 py-2 rounded-lg text-sm font-medium hover:opacity-90 active:scale-95 transition-all glow-button">
+        Get Started
+      </a>
+    </div>
+  </nav>
+
+  <main class="pt-28 flex-1">
+    <!-- Hero Section -->
+    <section class="px-6 md:px-12 max-w-7xl mx-auto mb-16">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div class="space-y-6">
+          <div class="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full border border-primary/20">
+            <span class="material-symbols-outlined text-sm">verified_user</span>
+            <span class="text-xs font-semibold uppercase tracking-wider">The Standard for Tech Hiring</span>
+          </div>
+
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-on-surface leading-tight tracking-tight">
+            Master the Code.<br/>
+            <span class="text-primary bg-gradient-to-r from-primary to-primary-container bg-clip-text text-transparent">Land the Job.</span>
+          </h1>
+
+          <p class="text-lg text-on-surface-variant max-w-lg leading-relaxed">
+            The ultimate high-performance environment for technical preparation. Simulate real interviews, master 50+ languages, and track your progress with industrial-grade analytics.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="editor.html" class="bg-primary text-on-primary px-8 py-3.5 rounded-xl font-semibold text-sm glow-button transition-all flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined text-lg">play_arrow</span>
+              Start Practicing Free
+            </a>
+            <a href="dashboard.html" class="border border-outline/40 text-on-surface px-8 py-3.5 rounded-xl font-semibold text-sm hover:bg-surface-container-low transition-all flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined text-lg">dashboard</span>
+              Explore Dashboard
+            </a>
+          </div>
+
+          <div class="flex items-center gap-8 pt-4 border-t border-outline-variant/30">
+            <div class="flex flex-col">
+              <span class="text-2xl font-bold text-on-surface">10k+</span>
+              <span class="text-xs text-on-surface-variant font-medium">Tests Taken</span>
+            </div>
+            <div class="w-px h-10 bg-outline-variant/40"></div>
+            <div class="flex flex-col">
+              <span class="text-2xl font-bold text-on-surface">99.9%</span>
+              <span class="text-xs text-on-surface-variant font-medium">Uptime SLA</span>
+            </div>
+            <div class="w-px h-10 bg-outline-variant/40"></div>
+            <div class="flex flex-col">
+              <span class="text-2xl font-bold text-on-surface">4.9/5</span>
+              <span class="text-xs text-on-surface-variant font-medium">Developer Rating</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Code Editor Visualizer Mockup -->
+        <div class="relative group">
+          <div class="absolute -inset-1 bg-gradient-to-r from-primary via-primary-container to-secondary opacity-25 blur-xl group-hover:opacity-40 transition-opacity rounded-2xl"></div>
+          <div class="relative code-gradient rounded-2xl overflow-hidden ambient-shadow-lg border border-white/10 text-white font-mono text-sm">
+            <div class="bg-white/5 px-4 py-3 flex items-center justify-between border-b border-white/10">
+              <div class="flex gap-2">
+                <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+                <div class="w-3 h-3 rounded-full bg-amber-500/80"></div>
+                <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
+              </div>
+              <div class="flex items-center gap-2 text-xs text-white/50">
+                <span class="material-symbols-outlined text-xs text-primary-fixed-dim">code</span>
+                <span>solution.py</span>
+              </div>
+              <div class="flex items-center gap-1.5 bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-sans font-semibold">
+                <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+                LIVE RUNNER
+              </div>
+            </div>
+
+            <div class="p-6 space-y-2 leading-relaxed">
+              <p><span class="syn-keyword">def</span> <span class="syn-func">solve_complex_problem</span>(data):</p>
+              <p class="pl-6 syn-comment"># Initialize high-speed evaluation engine</p>
+              <p class="pl-6"><span class="syn-keyword">if</span> <span class="syn-keyword">not</span> data: <span class="syn-keyword">return</span> <span class="syn-keyword">None</span></p>
+              <p class="pl-6 mt-3">result = perform_analysis(data)</p>
+              <p class="pl-6"><span class="syn-keyword">return</span> result.<span class="syn-func">optimize</span>()</p>
+              
+              <div class="pt-6 mt-4 border-t border-white/10 font-sans">
+                <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-3 flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-green-400">check_circle</span>
+                    <div>
+                      <p class="text-green-400 font-semibold text-xs">All 15/15 test cases passed</p>
+                      <p class="text-white/40 text-[11px]">Execution time: 42ms | Memory: 14.2MB</p>
+                    </div>
+                  </div>
+                  <span class="bg-green-500/20 text-green-300 text-[10px] px-2 py-1 rounded font-bold uppercase">+150 XP</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Logo Cloud -->
+    <section class="py-12 bg-surface-container-low border-y border-outline-variant/30 mb-16">
+      <div class="px-6 md:px-12 max-w-7xl mx-auto">
+        <p class="text-center text-xs font-semibold text-on-surface-variant uppercase tracking-widest mb-6">Trusted by engineering teams at</p>
+        <div class="flex flex-wrap justify-center items-center gap-12 md:gap-16 opacity-50 grayscale hover:grayscale-0 transition-all">
+          <div class="flex items-center gap-2 font-bold text-lg text-on-surface"><span class="material-symbols-outlined text-primary">hub</span> CORE_SYNC</div>
+          <div class="flex items-center gap-2 font-bold text-lg text-on-surface"><span class="material-symbols-outlined text-primary">shield</span> VECTR</div>
+          <div class="flex items-center gap-2 font-bold text-lg text-on-surface"><span class="material-symbols-outlined text-primary">grain</span> NEXUS</div>
+          <div class="flex items-center gap-2 font-bold text-lg text-on-surface"><span class="material-symbols-outlined text-primary">blur_on</span> QUANTUM</div>
+          <div class="flex items-center gap-2 font-bold text-lg text-on-surface"><span class="material-symbols-outlined text-primary">circle_notifications</span> ORBIT</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Bento Grid -->
+    <section class="px-6 md:px-12 max-w-7xl mx-auto mb-16" id="features">
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold text-on-surface mb-4">Built for the Modern Developer</h2>
+        <p class="text-base text-on-surface-variant">A comprehensive suite of tools designed to elevate your technical proficiency and bridge the gap between learning and hiring.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Feature 1 -->
+        <div class="md:col-span-2 bg-surface-container-lowest border border-outline-variant/50 p-8 rounded-2xl ambient-shadow hover:-translate-y-1 transition-all flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-6">
+              <span class="material-symbols-outlined text-primary text-2xl">bolt</span>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Real-time Evaluation Engine</h3>
+            <p class="text-on-surface-variant leading-relaxed max-w-md text-sm">
+              Our proprietary sandbox compiles and executes code in under 100ms. Get instant feedback on edge cases, memory limits, and time complexity with enterprise-grade precision.
+            </p>
+          </div>
+          <div class="mt-8 p-4 rounded-xl bg-surface-container-low border border-outline-variant/30 space-y-3">
+            <div class="flex items-center justify-between text-xs font-medium">
+              <span class="text-on-surface-variant">Compiler Speed</span>
+              <span class="text-primary font-bold">42ms (Top 1%)</span>
+            </div>
+            <div class="w-full h-2 bg-primary/10 rounded-full overflow-hidden">
+              <div class="h-full bg-primary w-[92%] rounded-full"></div>
+            </div>
+            <div class="flex items-center justify-between text-xs font-medium">
+              <span class="text-on-surface-variant">Memory Allocation</span>
+              <span class="text-secondary font-bold">Optimal O(1)</span>
+            </div>
+            <div class="w-full h-2 bg-secondary/10 rounded-full overflow-hidden">
+              <div class="h-full bg-secondary w-[85%] rounded-full"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="bg-surface-container-lowest border border-outline-variant/50 p-8 rounded-2xl ambient-shadow hover:-translate-y-1 transition-all">
+          <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-6">
+            <span class="material-symbols-outlined text-primary text-2xl">translate</span>
+          </div>
+          <h3 class="text-xl font-bold mb-2">50+ Languages</h3>
+          <p class="text-on-surface-variant leading-relaxed text-sm">
+            From Python to Rust, C++, and Go. Full framework support including React and Node.js.
+          </p>
+          <div class="grid grid-cols-3 gap-2 mt-6">
+            <div class="bg-surface-container py-2.5 rounded-lg text-center text-xs font-mono font-semibold text-primary">Python</div>
+            <div class="bg-surface-container py-2.5 rounded-lg text-center text-xs font-mono font-semibold text-primary">JS (ES6)</div>
+            <div class="bg-surface-container py-2.5 rounded-lg text-center text-xs font-mono font-semibold text-primary">C++20</div>
+            <div class="bg-surface-container py-2.5 rounded-lg text-center text-xs font-mono font-semibold text-primary">Rust</div>
+            <div class="bg-surface-container py-2.5 rounded-lg text-center text-xs font-mono font-semibold text-primary">Java 17</div>
+            <div class="bg-surface-container py-2.5 rounded-lg text-center text-xs font-mono font-semibold text-primary">TypeScript</div>
+          </div>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="md:col-span-3 bg-surface-container-lowest border border-outline-variant/50 p-8 rounded-2xl ambient-shadow hover:-translate-y-1 transition-all flex flex-col md:flex-row gap-8 items-center">
+          <div class="flex-1 space-y-4">
+            <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+              <span class="material-symbols-outlined text-primary text-2xl">analytics</span>
+            </div>
+            <h3 class="text-2xl font-bold">Detailed Industrial Analytics</h3>
+            <p class="text-on-surface-variant leading-relaxed text-sm">
+              Visualize your growth through activity heatmaps, difficulty distribution charts, and language proficiency scores. Benchmark yourself against global averages to see exactly where you stand.
+            </p>
+            <a href="dashboard.html" class="inline-block bg-surface-container text-primary font-semibold text-xs px-4 py-2 rounded-lg border border-outline-variant/40 hover:bg-surface-container-high transition-all">
+              View Live Demo Dashboard &rarr;
+            </a>
+          </div>
+          
+          <div class="flex-1 w-full bg-surface-container-low p-6 rounded-xl border border-outline-variant/40 space-y-4">
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-semibold text-on-surface">Weekly Problem Solving Velocity</span>
+              <span class="text-green-600 font-bold">+28% vs last week</span>
+            </div>
+            <div class="flex items-end gap-3 h-28 pt-4 border-b border-outline-variant/30">
+              <div class="flex-1 bg-primary/20 hover:bg-primary h-[40%] rounded-t transition-all group relative">
+                <span class="opacity-0 group-hover:opacity-100 absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] bg-on-surface text-surface px-1.5 py-0.5 rounded">Mon</span>
+              </div>
+              <div class="flex-1 bg-primary/20 hover:bg-primary h-[60%] rounded-t transition-all group relative">
+                <span class="opacity-0 group-hover:opacity-100 absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] bg-on-surface text-surface px-1.5 py-0.5 rounded">Tue</span>
+              </div>
+              <div class="flex-1 bg-primary/20 hover:bg-primary h-[85%] rounded-t transition-all group relative">
+                <span class="opacity-0 group-hover:opacity-100 absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] bg-on-surface text-surface px-1.5 py-0.5 rounded">Wed</span>
+              </div>
+              <div class="flex-1 bg-primary/20 hover:bg-primary h-[50%] rounded-t transition-all group relative">
+                <span class="opacity-0 group-hover:opacity-100 absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] bg-on-surface text-surface px-1.5 py-0.5 rounded">Thu</span>
+              </div>
+              <div class="flex-1 bg-primary h-[100%] rounded-t transition-all group relative">
+                <span class="opacity-0 group-hover:opacity-100 absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] bg-on-surface text-surface px-1.5 py-0.5 rounded font-bold">Fri</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="px-6 md:px-12 max-w-7xl mx-auto mb-16" id="pricing">
+      <div class="bg-surface-container-low rounded-3xl p-8 md:p-16 border border-outline-variant/30">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl md:text-4xl font-bold text-on-surface mb-4">Fair Pricing for Every Developer</h2>
+          <p class="text-base text-on-surface-variant">Choose the plan that fits your career goals.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          <!-- Free Plan -->
+          <div class="bg-surface-container-lowest p-8 rounded-2xl border border-outline-variant/50 flex flex-col justify-between">
+            <div>
+              <span class="text-xs uppercase font-semibold text-on-surface-variant tracking-widest">Base Plan</span>
+              <h3 class="text-4xl font-extrabold my-4">Free</h3>
+              <ul class="space-y-4 mb-8 text-sm">
+                <li class="flex gap-3 items-center text-on-surface-variant">
+                  <span class="material-symbols-outlined text-primary text-lg">check</span>
+                  500+ Practice Problems
+                </li>
+                <li class="flex gap-3 items-center text-on-surface-variant">
+                  <span class="material-symbols-outlined text-primary text-lg">check</span>
+                  Standard Code Editor
+                </li>
+                <li class="flex gap-3 items-center text-on-surface-variant">
+                  <span class="material-symbols-outlined text-primary text-lg">check</span>
+                  Community Forums & Discussions
+                </li>
+              </ul>
+            </div>
+            <a href="auth.html" class="block text-center w-full border border-outline/50 py-3 rounded-xl font-semibold text-sm hover:bg-surface-container transition-all">
+              Current Free Tier
+            </a>
+          </div>
+
+          <!-- Pro Plan -->
+          <div class="bg-primary text-on-primary p-8 rounded-2xl ambient-shadow-lg relative overflow-hidden flex flex-col justify-between">
+            <div class="absolute top-4 right-4 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
+              Most Popular
+            </div>
+            <div>
+              <span class="text-xs uppercase font-semibold text-on-primary/70 tracking-widest">Professional</span>
+              <h3 class="text-4xl font-extrabold my-4">$19<span class="text-lg opacity-70">/mo</span></h3>
+              <ul class="space-y-4 mb-8 text-sm">
+                <li class="flex gap-3 items-center">
+                  <span class="material-symbols-outlined text-green-300 text-lg">check</span>
+                  Unlimited Premium Company Problems
+                </li>
+                <li class="flex gap-3 items-center">
+                  <span class="material-symbols-outlined text-green-300 text-lg">check</span>
+                  Mock Interview Simulator with AI Feedback
+                </li>
+                <li class="flex gap-3 items-center">
+                  <span class="material-symbols-outlined text-green-300 text-lg">check</span>
+                  Advanced Performance & Speed Analytics
+                </li>
+                <li class="flex gap-3 items-center">
+                  <span class="material-symbols-outlined text-green-300 text-lg">check</span>
+                  Priority Cloud Container Execution
+                </li>
+              </ul>
+            </div>
+            <a href="auth.html" class="block text-center w-full bg-white text-primary py-3 rounded-xl font-semibold text-sm hover:bg-surface-container-low transition-all shadow-md">
+              Get Pro Access
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="px-6 md:px-12 max-w-7xl mx-auto mb-16">
+      <div class="code-gradient rounded-3xl p-12 md:p-16 text-center relative overflow-hidden text-white">
+        <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 24px 24px;"></div>
+        <h2 class="text-3xl md:text-5xl font-extrabold mb-4">Ready to Level Up Your Coding?</h2>
+        <p class="text-white/70 text-base max-w-xl mx-auto mb-8">
+          Join over 10,000 developers preparing for their dream technical roles at top tech companies.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="auth.html" class="bg-primary-container text-on-primary-container px-8 py-3.5 rounded-xl font-semibold text-sm glow-button inline-block">
+            Create Free Account
+          </a>
+          <a href="editor.html" class="bg-white/10 text-white backdrop-blur-md px-8 py-3.5 rounded-xl font-semibold text-sm border border-white/20 hover:bg-white/20 transition-all inline-block">
+            Try Code Editor Demo
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-surface-container-lowest border-t border-outline-variant/30 py-8">
+    <div class="max-w-7xl mx-auto px-6 md:px-12 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary text-xl">terminal</span>
+        <span class="font-bold text-on-surface">CodeTest Pro</span>
+        <span class="text-xs text-on-surface-variant ml-2">&copy; 2024 CodeTest Platform. Built for developers by developers.</span>
+      </div>
+      <div class="flex gap-6 text-xs text-on-surface-variant">
+        <a href="#" class="hover:text-primary transition-colors">Privacy Policy</a>
+        <a href="#" class="hover:text-primary transition-colors">Terms of Service</a>
+        <a href="#" class="hover:text-primary transition-colors">Help Center</a>
+        <a href="#" class="hover:text-primary transition-colors">API Status</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

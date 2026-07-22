@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Test Instructions | CodeTest Pro</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#004ac6",
+            "primary-container": "#2563eb",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#eeefff",
+            "surface": "#f9f9ff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f1f3ff",
+            "surface-container-high": "#e1e8fd",
+            "on-surface": "#141b2b",
+            "on-surface-variant": "#434655",
+            "outline-variant": "#c3c6d7",
+            "background": "#f9f9ff"
+          },
+          fontFamily: { sans: ["Inter", "sans-serif"], mono: ["JetBrains Mono", "monospace"] }
+        }
+      }
+    }
+  </script>
+  <style>
+    .ambient-shadow-lg { box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.08), 0 8px 16px -4px rgba(0, 0, 0, 0.03); }
+    .glow-button { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .glow-button:hover { box-shadow: 0 0 24px rgba(37, 99, 235, 0.35); transform: translateY(-1px); }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; display: inline-block; vertical-align: middle; }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-sans antialiased min-h-screen flex flex-col justify-center items-center p-4">
+
+  <div class="max-w-3xl w-full bg-surface-container-lowest border border-outline-variant/60 rounded-3xl p-6 md:p-10 ambient-shadow-lg space-y-6">
+    <div class="flex justify-between items-start border-b border-outline-variant/30 pb-4">
+      <div>
+        <span class="bg-primary/10 text-primary text-[11px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">Official Assessment</span>
+        <h1 class="text-2xl font-extrabold text-on-surface mt-2">Two Sum & Data Structures Examination</h1>
+        <p class="text-xs text-on-surface-variant">Host: TechCorp Global | Duration: 60 Minutes</p>
+      </div>
+      <div class="text-right font-mono text-xs text-on-surface-variant">
+        <p>Total Marks: <span class="text-primary font-bold">100</span></p>
+        <p>Questions: <span class="font-bold">5 MCQ + 1 Coding</span></p>
+      </div>
+    </div>
+
+    <!-- Instructions Guidelines -->
+    <div class="space-y-4 text-xs text-on-surface-variant leading-relaxed">
+      <h2 class="text-sm font-bold text-on-surface uppercase tracking-wider">Examination Rules & Guidelines</h2>
+      <ul class="list-disc list-inside space-y-2 font-medium">
+        <li><strong>Proctoring Mode:</strong> Fullscreen enforcement and tab-switch detection are enabled. Leaving the tab more than 2 times will auto-terminate the exam.</li>
+        <li><strong>Auto-Save:</strong> All question responses and code solutions auto-save automatically every 10 seconds.</li>
+        <li><strong>Negative Marking:</strong> MCQ section incurs 25% negative marking deduction for incorrect answers.</li>
+        <li><strong>Coding Section:</strong> Evaluated against hidden test cases using Judge0 compiler pipeline. Ensure time complexity limits are respected.</li>
+      </ul>
+    </div>
+
+    <!-- Security & Proctoring Checks -->
+    <div class="bg-surface-container-low p-4 rounded-2xl border border-outline-variant/40 space-y-3">
+      <h3 class="text-xs font-bold text-on-surface uppercase tracking-wider">System Compatibility & Proctoring Verification</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+        <div class="flex items-center gap-2 text-green-600 font-semibold">
+          <span class="material-symbols-outlined text-base">check_circle</span> Browser Compatibility OK
+        </div>
+        <div class="flex items-center gap-2 text-green-600 font-semibold">
+          <span class="material-symbols-outlined text-base">check_circle</span> Fullscreen Capability Enabled
+        </div>
+        <div class="flex items-center gap-2 text-green-600 font-semibold">
+          <span class="material-symbols-outlined text-base">check_circle</span> Code Sandbox Execution Ready
+        </div>
+        <div class="flex items-center gap-2 text-green-600 font-semibold">
+          <span class="material-symbols-outlined text-base">check_circle</span> Stable Internet Latency (&lt;35ms)
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirmation Checkbox -->
+    <div class="flex items-center gap-3 pt-2">
+      <input type="checkbox" id="rules-agree" class="rounded text-primary focus:ring-primary h-4 w-4 border-outline-variant cursor-pointer"/>
+      <label for="rules-agree" class="text-xs font-medium text-on-surface select-none cursor-pointer">
+        I have read and agree to the examination rules and proctoring policy.
+      </label>
+    </div>
+
+    <div class="flex gap-4 pt-4 border-t border-outline-variant/30">
+      <a href="dashboard.html" class="flex-1 text-center border border-outline-variant/60 py-3 rounded-xl font-semibold text-xs text-on-surface hover:bg-surface-container transition-all">
+        Back to Dashboard
+      </a>
+      <button onclick="startExam()" class="flex-1 bg-primary text-on-primary py-3 rounded-xl font-semibold text-xs glow-button shadow-md">
+        Start Exam Now &rarr;
+      </button>
+    </div>
+  </div>
+
+  <script>
+    function startExam() {
+      const checkbox = document.getElementById('rules-agree');
+      if (!checkbox.checked) {
+        alert('Please confirm that you have read and agree to the examination rules.');
+        return;
+      }
+
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      }
+
+      window.location.href = 'editor.html';
+    }
+  </script>
+</body>
+</html>

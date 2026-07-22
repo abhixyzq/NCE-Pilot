@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Assessment Results & Scorecard | CodeTest Pro</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#004ac6",
+            "primary-container": "#2563eb",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#eeefff",
+            "secondary": "#006e2f",
+            "tertiary": "#784b00",
+            "surface": "#f9f9ff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f1f3ff",
+            "surface-container-high": "#e1e8fd",
+            "on-surface": "#141b2b",
+            "on-surface-variant": "#434655",
+            "outline-variant": "#c3c6d7",
+            "background": "#f9f9ff"
+          },
+          fontFamily: { sans: ["Inter", "sans-serif"], mono: ["JetBrains Mono", "monospace"] }
+        }
+      }
+    }
+  </script>
+  <style>
+    .ambient-shadow-lg { box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.08), 0 8px 16px -4px rgba(0, 0, 0, 0.03); }
+    .glow-button { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .glow-button:hover { box-shadow: 0 0 24px rgba(37, 99, 235, 0.35); transform: translateY(-1px); }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; display: inline-block; vertical-align: middle; }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-sans antialiased min-h-screen flex flex-col justify-center items-center p-4 py-12">
+
+  <div class="max-w-4xl w-full space-y-6">
+    <!-- Header Summary Card -->
+    <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-3xl p-6 md:p-8 ambient-shadow-lg flex flex-col md:flex-row justify-between items-center gap-6">
+      <div class="space-y-2 text-center md:text-left">
+        <div class="inline-flex items-center gap-2 bg-green-500/15 text-green-700 px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider">
+          <span class="material-symbols-outlined text-sm">verified</span> Assessment Passed
+        </div>
+        <h1 class="text-2xl md:text-3xl font-extrabold text-on-surface">Two Sum & Data Structures Assessment</h1>
+        <p class="text-xs text-on-surface-variant">Candidate: Alex Rivera • Evaluation completed on July 22, 2026</p>
+      </div>
+
+      <div class="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/40 text-center min-w-[200px]">
+        <span class="text-xs text-on-surface-variant uppercase font-semibold tracking-wider">Final Score</span>
+        <p class="text-4xl font-extrabold text-primary my-1">100 <span class="text-base text-on-surface-variant font-normal">/ 100</span></p>
+        <span class="text-xs text-green-600 font-bold">100% Performance Score</span>
+      </div>
+    </div>
+
+    <!-- Metrics Breakdown Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-5 ambient-shadow">
+        <span class="text-xs text-on-surface-variant font-medium">MCQ Score</span>
+        <p class="text-2xl font-extrabold text-on-surface mt-1">40 / 40</p>
+        <p class="text-[11px] text-green-600 font-semibold mt-1">5/5 Correct (0 Penalty)</p>
+      </div>
+
+      <div class="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-5 ambient-shadow">
+        <span class="text-xs text-on-surface-variant font-medium">Coding Score</span>
+        <p class="text-2xl font-extrabold text-on-surface mt-1">60 / 60</p>
+        <p class="text-[11px] text-green-600 font-semibold mt-1">All 15 Test Cases Passed</p>
+      </div>
+
+      <div class="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-5 ambient-shadow">
+        <span class="text-xs text-on-surface-variant font-medium">Time Taken</span>
+        <p class="text-2xl font-extrabold text-on-surface mt-1">18m 42s</p>
+        <p class="text-[11px] text-on-surface-variant font-medium mt-1">Out of 60m 00s limit</p>
+      </div>
+
+      <div class="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-5 ambient-shadow">
+        <span class="text-xs text-on-surface-variant font-medium">Global Rank</span>
+        <p class="text-2xl font-extrabold text-amber-600 mt-1">#12 🏆</p>
+        <p class="text-[11px] text-green-600 font-semibold mt-1">Top 1% Percentile</p>
+      </div>
+    </div>
+
+    <!-- Section Performance Breakdown -->
+    <div class="bg-surface-container-lowest border border-outline-variant/50 rounded-3xl p-6 md:p-8 ambient-shadow-lg space-y-6">
+      <h2 class="text-lg font-bold text-on-surface">Detailed Section Breakdown</h2>
+      
+      <div class="space-y-4 text-xs font-medium">
+        <div class="bg-surface-container-low p-4 rounded-2xl border border-outline-variant/30 space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-on-surface text-sm">Section 1: Data Structures MCQs</span>
+            <span class="text-green-600 font-bold">40 / 40 Marks (100%)</span>
+          </div>
+          <div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+            <div class="h-full bg-green-500 w-full rounded-full"></div>
+          </div>
+        </div>
+
+        <div class="bg-surface-container-low p-4 rounded-2xl border border-outline-variant/30 space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-on-surface text-sm">Section 2: Coding Algorithm (Two Sum)</span>
+            <span class="text-green-600 font-bold">60 / 60 Marks (100%)</span>
+          </div>
+          <div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+            <div class="h-full bg-primary w-full rounded-full"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row gap-4 pt-4 border-t border-outline-variant/30">
+        <button onclick="downloadCertificate()" class="flex-1 bg-primary text-on-primary py-3 rounded-xl font-semibold text-xs glow-button shadow-md flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">workspace_premium</span>
+          Download Official Certificate
+        </button>
+        <a href="dashboard.html" class="flex-1 text-center border border-outline-variant/60 py-3 rounded-xl font-semibold text-xs text-on-surface hover:bg-surface-container transition-all">
+          Return to Student Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function downloadCertificate() {
+      alert('Generating verified Certificate of Achievement for Alex Rivera... Download starting!');
+    }
+  </script>
+</body>
+</html>
