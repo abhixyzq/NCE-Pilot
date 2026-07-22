@@ -1,7 +1,7 @@
 import { TeacherService } from '../services/teacherService.js';
 
 let activeTab = 'dash';
-let activeQuestionType = 'MCQ';
+let activeQuestionType = 'OBJECTIVE'; // OBJECTIVE, MCQ_MULTIPLE, SUBJECTIVE, CODING
 
 export function renderTeacherPortal() {
   const content = document.getElementById('teacher-content');
@@ -75,17 +75,19 @@ function renderDashboardView() {
                 <th class="py-3 px-4">Exam Title</th>
                 <th class="py-3 px-4">Subject</th>
                 <th class="py-3 px-4">Duration</th>
+                <th class="py-3 px-4">Total Marks (Auto)</th>
                 <th class="py-3 px-4">Status</th>
                 <th class="py-3 px-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-outline-variant/20 font-medium">
-              ${exams.map(e => `
+              ${exams.length > 0 ? exams.map(e => `
                 <tr class="hover:bg-surface-container-low transition-colors">
                   <td class="py-3 px-4 font-mono font-bold text-primary">${e.code}</td>
                   <td class="py-3 px-4 font-bold text-on-surface">${e.name}</td>
                   <td class="py-3 px-4 text-on-surface-variant">${e.subject}</td>
                   <td class="py-3 px-4 font-mono">${e.durationMinutes} min</td>
+                  <td class="py-3 px-4 font-mono font-bold text-primary">${e.totalMarks} Marks</td>
                   <td class="py-3 px-4">
                     <span class="${e.status === 'PUBLISHED' ? 'bg-green-500/15 text-green-700' : 'bg-amber-500/15 text-amber-700'} text-[10px] font-extrabold px-2.5 py-1 rounded-full">
                       ${e.status}
@@ -99,7 +101,7 @@ function renderDashboardView() {
                     <button onclick="deleteExam('${e.id}')" class="text-xs font-semibold text-red-600 hover:underline">Delete</button>
                   </td>
                 </tr>
-              `).join('')}
+              `).join('') : `<tr><td colspan="7" class="py-8 text-center text-on-surface-variant">No exams created yet. Click "+ Create New Exam" to build your first exam.</td></tr>`}
             </tbody>
           </table>
         </div>
@@ -110,15 +112,17 @@ function renderDashboardView() {
 
 function renderCreateExamView() {
   const code = TeacherService.generateExamCode();
+  const qBank = TeacherService.getQuestionBank();
+
   return `
     <div class="max-w-4xl mx-auto space-y-6">
       <div class="flex justify-between items-center">
         <div>
           <h1 class="text-2xl font-bold text-on-surface">Create New Examination</h1>
-          <p class="text-xs text-on-surface-variant">Configure assessment parameters, proctoring options, and add MCQ or Coding questions.</p>
+          <p class="text-xs text-on-surface-variant">Configure parameters, pick Question IDs, and auto-calculate total marks.</p>
         </div>
         <button type="button" onclick="openAddQuestionModal()" class="bg-primary text-on-primary px-4 py-2.5 rounded-xl font-semibold text-xs glow-button flex items-center gap-1.5">
-          <span class="material-symbols-outlined text-sm">add_circle</span> Add Question
+          <span class="material-symbols-outlined text-sm">add_circle</span> Author Question
         </button>
       </div>
 
@@ -127,7 +131,7 @@ function renderCreateExamView() {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-bold text-on-surface mb-1">Exam Name</label>
-            <input type="text" id="ex-name" required value="Algorithms & Complexity Assessment 2026" class="w-full px-3.5 py-2.5 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs outline-none focus:border-primary"/>
+            <input type="text" id="ex-name" required placeholder="e.g. Data Structures Midterm 2026" class="w-full px-3.5 py-2.5 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs outline-none focus:border-primary"/>
           </div>
 
           <div>
@@ -137,12 +141,12 @@ function renderCreateExamView() {
 
           <div>
             <label class="block text-xs font-bold text-on-surface mb-1">Subject</label>
-            <input type="text" id="ex-subject" required value="Computer Science" class="w-full px-3.5 py-2.5 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs outline-none focus:border-primary"/>
+            <input type="text" id="ex-subject" required placeholder="e.g. Computer Science" class="w-full px-3.5 py-2.5 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs outline-none focus:border-primary"/>
           </div>
 
           <div>
             <label class="block text-xs font-bold text-on-surface mb-1">Department & Semester</label>
-            <input type="text" id="ex-dept" required value="CS & Engineering (Fall 2026)" class="w-full px-3.5 py-2.5 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs outline-none focus:border-primary"/>
+            <input type="text" id="ex-dept" required placeholder="e.g. CS & Engineering (Fall 2026)" class="w-full px-3.5 py-2.5 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs outline-none focus:border-primary"/>
           </div>
 
           <div>
@@ -150,57 +154,49 @@ function renderCreateExamView() {
             <input type="number" id="ex-duration" required value="60" class="w-full px-3.5 py-2.5 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs outline-none focus:border-primary"/>
           </div>
 
+          <!-- Auto-Calculated Total Marks Badge -->
           <div>
-            <label class="block text-xs font-bold text-on-surface mb-1">Total Marks / Passing Marks</label>
-            <div class="flex gap-2">
-              <input type="number" id="ex-total" required value="100" placeholder="Total" class="w-1/2 px-3.5 py-2.5 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs outline-none focus:border-primary"/>
-              <input type="number" id="ex-passing" required value="60" placeholder="Passing" class="w-1/2 px-3.5 py-2.5 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs outline-none focus:border-primary"/>
+            <label class="block text-xs font-bold text-on-surface mb-1">Total Marks (Auto-Calculated)</label>
+            <div class="px-3.5 py-2.5 bg-primary/10 border border-primary/30 rounded-xl text-xs font-bold text-primary flex items-center justify-between">
+              <span>Auto Count:</span>
+              <span id="auto-total-marks-badge" class="text-sm font-mono font-extrabold">0 Marks</span>
             </div>
           </div>
         </div>
 
-        <!-- Checkbox Options -->
-        <div class="pt-4 border-t border-outline-variant/30 space-y-3">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-on-surface">Proctoring & Assessment Rules</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked id="ex-rand" class="rounded text-primary focus:ring-primary"/>
-              Randomize Questions
-            </label>
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked id="ex-neg" class="rounded text-primary focus:ring-primary"/>
-              Negative Marking (25%)
-            </label>
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked id="ex-auto" class="rounded text-primary focus:ring-primary"/>
-              Auto Submit on Timer
-            </label>
-          </div>
-        </div>
-
-        <!-- Questions Section Summary -->
+        <!-- Question Bank Picker Checklist -->
         <div class="pt-4 border-t border-outline-variant/30 space-y-3">
           <div class="flex justify-between items-center">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-on-surface">Exam Questions (2 Configured)</h3>
-            <button type="button" onclick="openAddQuestionModal()" class="text-xs font-bold text-primary hover:underline">+ Add Another Question</button>
+            <div>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-on-surface">Select Questions from Question Bank</h3>
+              <p class="text-[11px] text-on-surface-variant">Check questions by ID to include in this exam.</p>
+            </div>
+            <button type="button" onclick="openAddQuestionModal()" class="text-xs font-bold text-primary hover:underline">+ Create Question</button>
           </div>
 
-          <div class="space-y-2 text-xs">
-            <div class="bg-surface-container-low p-3 rounded-xl flex justify-between items-center border border-outline-variant/30">
-              <div>
-                <span class="font-bold text-on-surface">1. What is the average time complexity of insertion in a Hash Map?</span>
-                <p class="text-on-surface-variant text-[11px]">MCQ • Correct Answer: O(1)</p>
+          <div class="space-y-2 max-h-60 overflow-y-auto pr-1">
+            ${qBank.length > 0 ? qBank.map(q => `
+              <label class="bg-surface-container-low p-3 rounded-xl flex justify-between items-center border border-outline-variant/30 hover:border-primary/40 cursor-pointer transition-all">
+                <div class="flex items-center gap-3">
+                  <input type="checkbox" name="selected-q-ids" value="${q.id}" data-marks="${q.marks}" onchange="recalculateTotalMarks()" class="rounded text-primary focus:ring-primary"/>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="font-mono text-[10px] bg-primary/10 text-primary font-bold px-1.5 py-0.5 rounded">${q.id}</span>
+                      <span class="bg-surface-container-high text-on-surface text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">${q.type}</span>
+                    </div>
+                    <p class="font-bold text-xs text-on-surface mt-0.5">${q.prompt || q.title}</p>
+                  </div>
+                </div>
+                <span class="font-mono font-bold text-xs text-primary">${q.marks} Marks</span>
+              </label>
+            `).join('') : `
+              <div class="p-6 text-center border-2 border-dashed border-outline-variant/40 rounded-xl space-y-2">
+                <p class="text-xs text-on-surface-variant font-medium">Question Bank is empty.</p>
+                <button type="button" onclick="openAddQuestionModal()" class="bg-primary text-on-primary px-3.5 py-1.5 rounded-xl font-semibold text-xs glow-button">
+                  + Add First Question
+                </button>
               </div>
-              <span class="font-mono font-bold text-primary">40 Marks</span>
-            </div>
-
-            <div class="bg-surface-container-low p-3 rounded-xl flex justify-between items-center border border-outline-variant/30">
-              <div>
-                <span class="font-bold text-on-surface">2. Two Sum Algorithm Problem</span>
-                <p class="text-on-surface-variant text-[11px]">Coding Problem • 3 Test Cases Attached</p>
-              </div>
-              <span class="font-mono font-bold text-primary">60 Marks</span>
-            </div>
+            `}
           </div>
         </div>
 
@@ -226,44 +222,49 @@ function renderQuestionBankView() {
       <div class="flex justify-between items-center">
         <div>
           <h1 class="text-2xl font-bold text-on-surface">Question Bank Repository</h1>
-          <p class="text-xs text-on-surface-variant">Reuse, search, and author questions across exams.</p>
+          <p class="text-xs text-on-surface-variant">Author and manage Objective, Multiple Choice, Subjective, and Coding questions.</p>
         </div>
         <button onclick="openAddQuestionModal()" class="bg-primary text-on-primary px-4 py-2.5 rounded-xl font-semibold text-xs glow-button flex items-center gap-1.5">
           <span class="material-symbols-outlined text-sm">add_circle</span> Create New Question
         </button>
       </div>
 
-      <!-- Filters -->
+      <!-- Filter Bar -->
       <div class="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-4 flex gap-3 flex-wrap items-center">
-        <input type="text" placeholder="Search questions..." class="px-3.5 py-2 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs flex-1 outline-none"/>
+        <input type="text" placeholder="Search by Question ID or Keyword..." class="px-3.5 py-2 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs flex-1 outline-none"/>
         <select class="px-3 py-2 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs outline-none">
-          <option>All Subjects</option>
-          <option>Data Structures</option>
-          <option>Algorithms</option>
-        </select>
-        <select class="px-3 py-2 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs outline-none">
-          <option>All Types</option>
-          <option>MCQ</option>
+          <option>All Question Types</option>
+          <option>Objective (Single Choice)</option>
+          <option>Multiple Choice (Multi-Correct)</option>
+          <option>Subjective</option>
           <option>Coding</option>
         </select>
       </div>
 
       <!-- Questions List -->
       <div class="space-y-3" id="qb-questions-list">
-        ${questions.map(q => `
+        ${questions.length > 0 ? questions.map(q => `
           <div class="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-5 ambient-shadow space-y-2">
             <div class="flex justify-between items-start">
-              <span class="bg-primary/10 text-primary text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">${q.type} • ${q.difficulty}</span>
-              <span class="text-xs font-mono text-on-surface-variant font-bold">${q.marks} Marks</span>
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-[11px] bg-primary/10 text-primary font-bold px-2 py-0.5 rounded">${q.id}</span>
+                <span class="bg-surface-container-high text-on-surface text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">${q.type}</span>
+              </div>
+              <span class="text-xs font-mono text-primary font-extrabold">${q.marks} Marks</span>
             </div>
             <h3 class="text-sm font-bold text-on-surface">${q.prompt || q.title}</h3>
-            <p class="text-xs text-on-surface-variant">${q.explanation || q.statement || ''}</p>
-            <div class="pt-2 flex justify-between items-center text-xs">
-              <span class="text-on-surface-variant font-mono">${q.subject} / ${q.topic}</span>
-              <button onclick="alert('Question added to active exam!')" class="text-primary font-semibold hover:underline">Reuse in Exam +</button>
-            </div>
+            <p class="text-xs text-on-surface-variant">${q.explanation || q.statement || q.subjectiveAnswer || ''}</p>
           </div>
-        `).join('')}
+        `).join('') : `
+          <div class="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-12 text-center space-y-3">
+            <span class="material-symbols-outlined text-4xl text-on-surface-variant">quiz</span>
+            <h3 class="text-sm font-bold text-on-surface">No Questions in Question Bank</h3>
+            <p class="text-xs text-on-surface-variant max-w-sm mx-auto">Create questions to add them to your repository and build exams.</p>
+            <button onclick="openAddQuestionModal()" class="bg-primary text-on-primary px-4 py-2 rounded-xl text-xs font-semibold glow-button">
+              + Author First Question
+            </button>
+          </div>
+        `}
       </div>
     </div>
   `;
@@ -271,108 +272,32 @@ function renderQuestionBankView() {
 
 function renderManualReviewView() {
   const queue = TeacherService.getManualReviewQueue();
-  const item = queue[0];
-
   return `
     <div class="space-y-6 max-w-5xl mx-auto">
       <div>
-        <h1 class="text-2xl font-bold text-on-surface">Manual Code Review Queue</h1>
-        <p class="text-xs text-on-surface-variant">Evaluate candidate submissions requiring manual teacher sign-off.</p>
+        <h1 class="text-2xl font-bold text-on-surface">Manual Review Queue</h1>
+        <p class="text-xs text-on-surface-variant">Evaluate subjective text responses and code submissions.</p>
       </div>
 
-      ${item ? `
-        <div class="bg-surface-container-lowest border border-outline-variant/50 rounded-2xl p-6 md:p-8 ambient-shadow space-y-6">
-          <div class="flex justify-between items-start border-b border-outline-variant/30 pb-4">
-            <div>
-              <span class="bg-amber-500/15 text-amber-700 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase">Pending Review</span>
-              <h2 class="text-xl font-bold text-on-surface mt-2">${item.studentName} (${item.studentEmail})</h2>
-              <p class="text-xs text-on-surface-variant">Exam: ${item.examTitle} | Submitted: Just now</p>
-            </div>
-            <div class="text-right">
-              <span class="text-xs font-mono font-bold text-primary">${item.language}</span>
-              <p class="text-xs text-green-600 font-bold">Public Tests: ${item.publicTestResults}</p>
-              <p class="text-xs text-green-600 font-bold">Hidden Tests: ${item.hiddenTestResults}</p>
-            </div>
-          </div>
-
-          <!-- Code View -->
-          <div class="space-y-2">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-on-surface">Student Code Submission</h3>
-            <pre class="bg-[#0f172a] text-emerald-300 p-4 rounded-xl font-mono text-xs overflow-x-auto leading-relaxed border border-white/10">${item.sourceCode}</pre>
-          </div>
-
-          <!-- AI Evaluation Summary & Suggested Score -->
-          <div class="bg-primary/5 border border-primary/20 rounded-xl p-4 space-y-2 text-xs">
-            <div class="flex justify-between items-center">
-              <span class="font-bold text-primary flex items-center gap-1">
-                <span class="material-symbols-outlined text-sm">auto_awesome</span> AI Code Analysis & Evaluation
-              </span>
-              <span class="bg-primary text-on-primary text-[11px] font-bold px-3 py-1 rounded-full">
-                AI Suggested Score: ${item.aiSuggestedScore} / ${item.maxMarks}
-              </span>
-            </div>
-            <p class="text-on-surface-variant leading-relaxed">${item.aiSummary}</p>
-          </div>
-
-          <!-- Teacher Feedback Form -->
-          <form onsubmit="handleTeacherReview(event, '${item.id}')" class="space-y-4 pt-4 border-t border-outline-variant/30">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-xs font-bold text-on-surface mb-1">Final Awarded Marks (Max ${item.maxMarks})</label>
-                <input type="number" id="review-marks" required value="${item.aiSuggestedScore}" max="${item.maxMarks}" class="w-full px-3.5 py-2.5 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs font-bold text-primary outline-none focus:border-primary"/>
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-on-surface mb-1">Teacher Feedback & Comments</label>
-                <input type="text" id="review-feedback" placeholder="Excellent solution with optimal hash map..." value="Great work! Efficient O(N) execution with zero memory overhead." class="w-full px-3.5 py-2.5 bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs outline-none focus:border-primary"/>
-              </div>
-            </div>
-
-            <button type="submit" class="w-full bg-primary text-on-primary py-3 rounded-xl font-semibold text-xs glow-button shadow-md">
-              Confirm & Submit Review Evaluation
-            </button>
-          </form>
-        </div>
-      ` : `<p class="text-xs text-on-surface-variant">No pending evaluations in queue.</p>`}
+      <div class="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-8 text-center text-xs text-on-surface-variant">
+        No pending subjective reviews in queue.
+      </div>
     </div>
   `;
 }
 
 function renderAnalyticsView() {
   const analytics = TeacherService.getAnalytics();
-
   return `
     <div class="space-y-6">
       <div class="flex justify-between items-center">
         <div>
           <h1 class="text-2xl font-bold text-on-surface">Exam Results & Analytics</h1>
-          <p class="text-xs text-on-surface-variant">Deep insights into student accuracy, score distributions, and CSV export.</p>
+          <p class="text-xs text-on-surface-variant">Export student performance data to Excel / CSV.</p>
         </div>
         <button onclick="downloadCSVReport()" class="bg-primary text-on-primary px-4 py-2 rounded-xl font-semibold text-xs glow-button flex items-center gap-2">
-          <span class="material-symbols-outlined text-sm">download</span> Export Excel / CSV Report
+          <span class="material-symbols-outlined text-sm">download</span> Export Report
         </button>
-      </div>
-
-      <!-- Key Analytics Metrics -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-5 ambient-shadow">
-          <span class="text-xs text-on-surface-variant font-medium">Highest Score</span>
-          <p class="text-2xl font-extrabold text-green-600 mt-1">${analytics.highestScore} / 100</p>
-        </div>
-
-        <div class="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-5 ambient-shadow">
-          <span class="text-xs text-on-surface-variant font-medium">Average Score</span>
-          <p class="text-2xl font-extrabold text-primary mt-1">${analytics.averageScore} / 100</p>
-        </div>
-
-        <div class="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-5 ambient-shadow">
-          <span class="text-xs text-on-surface-variant font-medium">MCQ Accuracy</span>
-          <p class="text-2xl font-extrabold text-on-surface mt-1">${analytics.mcqAccuracy}%</p>
-        </div>
-
-        <div class="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-5 ambient-shadow">
-          <span class="text-xs text-on-surface-variant font-medium">Coding Pass Rate</span>
-          <p class="text-2xl font-extrabold text-on-surface mt-1">${analytics.codingSuccessRate}%</p>
-        </div>
       </div>
     </div>
   `;
@@ -384,60 +309,41 @@ window.switchTab = function(tab) {
   renderTeacherPortal();
 };
 
-window.togglePublish = function(id) {
-  TeacherService.togglePublish(id);
-  renderTeacherPortal();
-};
+window.recalculateTotalMarks = function() {
+  const checkboxes = document.querySelectorAll('input[name="selected-q-ids"]:checked');
+  let total = 0;
+  checkboxes.forEach(cb => {
+    total += parseInt(cb.getAttribute('data-marks')) || 0;
+  });
 
-window.duplicateExam = function(id) {
-  TeacherService.duplicateExam(id);
-  renderTeacherPortal();
-};
-
-window.deleteExam = function(id) {
-  TeacherService.deleteExam(id);
-  renderTeacherPortal();
+  const badge = document.getElementById('auto-total-marks-badge');
+  if (badge) badge.innerText = `${total} Marks`;
 };
 
 window.handleCreateExam = function(e) {
   e.preventDefault();
+
+  const selectedBoxes = document.querySelectorAll('input[name="selected-q-ids"]:checked');
+  const questionIds = Array.from(selectedBoxes).map(cb => cb.value);
+
+  if (questionIds.length === 0) {
+    alert('Please select at least 1 Question from the Question Bank checklist.');
+    return;
+  }
+
   const data = {
     name: document.getElementById('ex-name').value,
     code: document.getElementById('ex-code').value,
     subject: document.getElementById('ex-subject').value,
     department: document.getElementById('ex-dept').value,
     durationMinutes: document.getElementById('ex-duration').value,
-    totalMarks: document.getElementById('ex-total').value,
-    passingMarks: document.getElementById('ex-passing').value,
-    randomize: document.getElementById('ex-rand').checked,
-    negativeMarking: document.getElementById('ex-neg').checked,
-    autoSubmit: document.getElementById('ex-auto').checked,
+    questionIds,
     status: 'PUBLISHED'
   };
 
-  TeacherService.createExam(data);
-  alert(`Exam "${data.name}" created and published! Share Exam Code: ${data.code}`);
+  const created = TeacherService.createExam(data);
+  alert(`Exam "${created.name}" created successfully! Auto-Counted Total Marks: ${created.totalMarks} Marks. Share Exam Code: ${created.code}`);
   window.switchTab('dash');
-};
-
-window.handleTeacherReview = function(e, reviewId) {
-  e.preventDefault();
-  const marks = document.getElementById('review-marks').value;
-  const feedback = document.getElementById('review-feedback').value;
-
-  TeacherService.submitTeacherReview(reviewId, marks, feedback);
-  alert('Review submitted successfully! Results updated for student.');
-  window.switchTab('dash');
-};
-
-window.downloadCSVReport = function() {
-  const csv = TeacherService.exportResultsCSV();
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'CodeTest_Exam_Results_2026.csv';
-  a.click();
 };
 
 window.openAddQuestionModal = function() {
@@ -452,73 +358,84 @@ window.closeAddQuestionModal = function() {
 
 window.switchQuestionTypeForm = function(type) {
   activeQuestionType = type;
-  const mcqBtn = document.getElementById('qtype-btn-mcq');
-  const codingBtn = document.getElementById('qtype-btn-coding');
-  const mcqFields = document.getElementById('qform-mcq-fields');
-  const codingFields = document.getElementById('qform-coding-fields');
+  const types = ['OBJECTIVE', 'MCQ_MULTIPLE', 'SUBJECTIVE', 'CODING'];
 
-  if (type === 'CODING') {
-    codingBtn.className = "flex-1 py-2 rounded-lg text-xs font-semibold transition-all bg-surface-container-lowest text-primary shadow-sm";
-    mcqBtn.className = "flex-1 py-2 rounded-lg text-xs font-semibold transition-all text-on-surface-variant hover:text-on-surface";
-    codingFields.classList.remove('hidden');
-    mcqFields.classList.add('hidden');
-  } else {
-    mcqBtn.className = "flex-1 py-2 rounded-lg text-xs font-semibold transition-all bg-surface-container-lowest text-primary shadow-sm";
-    codingBtn.className = "flex-1 py-2 rounded-lg text-xs font-semibold transition-all text-on-surface-variant hover:text-on-surface";
-    mcqFields.classList.remove('hidden');
-    codingFields.classList.add('hidden');
-  }
+  types.forEach(t => {
+    const btn = document.getElementById(`qtype-btn-${t.toLowerCase()}`);
+    const field = document.getElementById(`qform-${t.toLowerCase()}-fields`);
+
+    if (t === type) {
+      if (btn) btn.className = "flex-1 py-2 rounded-lg text-xs font-semibold transition-all bg-surface-container-lowest text-primary shadow-sm";
+      if (field) field.classList.remove('hidden');
+    } else {
+      if (btn) btn.className = "flex-1 py-2 rounded-lg text-xs font-semibold transition-all text-on-surface-variant hover:text-on-surface";
+      if (field) field.classList.add('hidden');
+    }
+  });
 };
 
 window.handleSaveNewQuestion = function(e) {
   e.preventDefault();
 
-  if (activeQuestionType === 'MCQ') {
-    const prompt = document.getElementById('q-mcq-prompt').value;
-    const opt0 = document.getElementById('q-opt-0').value;
-    const opt1 = document.getElementById('q-opt-1').value;
-    const opt2 = document.getElementById('q-opt-2').value;
-    const opt3 = document.getElementById('q-opt-3').value;
-    const correctIdx = parseInt(document.getElementById('q-correct-idx').value);
-    const marks = parseInt(document.getElementById('q-mcq-marks').value);
-    const explanation = document.getElementById('q-mcq-explanation').value;
+  if (activeQuestionType === 'OBJECTIVE') {
+    const prompt = document.getElementById('q-obj-prompt').value;
+    const opt0 = document.getElementById('q-obj-opt-0').value;
+    const opt1 = document.getElementById('q-obj-opt-1').value;
+    const opt2 = document.getElementById('q-obj-opt-2').value;
+    const opt3 = document.getElementById('q-obj-opt-3').value;
+    const correctIdx = parseInt(document.getElementById('q-obj-correct').value);
+    const marks = parseInt(document.getElementById('q-obj-marks').value);
 
     TeacherService.saveQuestionToBank({
-      type: 'MCQ',
-      subject: 'Data Structures',
-      topic: 'General',
-      difficulty: 'Easy',
-      marks,
+      type: 'OBJECTIVE',
       prompt,
       options: [opt0, opt1, opt2, opt3],
-      correctAnswer: correctIdx,
-      explanation
+      correctAnswers: [correctIdx],
+      marks
     });
-  } else {
+  } else if (activeQuestionType === 'MCQ_MULTIPLE') {
+    const prompt = document.getElementById('q-mcqmulti-prompt').value;
+    const opt0 = document.getElementById('q-multi-opt-0').value;
+    const opt1 = document.getElementById('q-multi-opt-1').value;
+    const opt2 = document.getElementById('q-multi-opt-2').value;
+    const opt3 = document.getElementById('q-multi-opt-3').value;
+    const marks = parseInt(document.getElementById('q-multi-marks').value);
+
+    TeacherService.saveQuestionToBank({
+      type: 'MCQ_MULTIPLE',
+      prompt,
+      options: [opt0, opt1, opt2, opt3],
+      correctAnswers: [0, 1],
+      marks
+    });
+  } else if (activeQuestionType === 'SUBJECTIVE') {
+    const prompt = document.getElementById('q-subj-prompt').value;
+    const modelAns = document.getElementById('q-subj-model').value;
+    const marks = parseInt(document.getElementById('q-subj-marks').value);
+
+    TeacherService.saveQuestionToBank({
+      type: 'SUBJECTIVE',
+      prompt,
+      subjectiveAnswer: modelAns,
+      marks
+    });
+  } else { // CODING
     const title = document.getElementById('q-code-title').value;
     const statement = document.getElementById('q-code-statement').value;
-    const constraints = document.getElementById('q-code-constraints').value;
     const pubIn = document.getElementById('q-pub-input').value;
     const pubOut = document.getElementById('q-pub-output').value;
-    const hidIn = document.getElementById('q-hid-input').value;
-    const hidOut = document.getElementById('q-hid-output').value;
     const marks = parseInt(document.getElementById('q-code-marks').value);
 
     TeacherService.saveQuestionToBank({
       type: 'CODING',
-      subject: 'Algorithms',
-      topic: 'Logic',
-      difficulty: 'Medium',
-      marks,
       title,
       statement,
-      constraints,
-      publicTestCases: [{ input: pubIn, output: pubOut, weight: 20 }],
-      hiddenTestCases: [{ input: hidIn, output: hidOut, weight: 40 }]
+      marks,
+      publicTestCases: [{ input: pubIn, output: pubOut, weight: marks }]
     });
   }
 
-  alert('Question created & added to Question Bank / Exam successfully!');
+  alert('Question authored & added to Question Bank!');
   window.closeAddQuestionModal();
   renderTeacherPortal();
 };

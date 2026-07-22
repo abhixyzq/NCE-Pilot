@@ -1,5 +1,5 @@
 /**
- * Teacher Service - Clean Dynamic Exam Management & Question Bank Engine
+ * Teacher Service - Exam Creator with Question Selection & Auto-Calculated Total Marks
  */
 
 let EXAMS_STORE = [];
@@ -33,9 +33,17 @@ export class TeacherService {
   }
 
   /**
-   * Create a new Exam
+   * Create a new Exam with auto-counted total marks from selected question IDs
    */
   static createExam(examData) {
+    const selectedQuestionIds = examData.questionIds || [];
+    
+    // Find matching questions from Question Bank
+    const attachedQuestions = QUESTION_BANK.filter(q => selectedQuestionIds.includes(q.id));
+
+    // Auto-calculate Total Marks as sum of selected question marks
+    const autoTotalMarks = attachedQuestions.reduce((acc, q) => acc + (parseInt(q.marks) || 0), 0);
+
     const newExam = {
       id: `exam_${Date.now()}`,
       code: examData.code || this.generateExamCode(),
@@ -44,8 +52,8 @@ export class TeacherService {
       department: examData.department || 'CS & Engineering',
       semester: examData.semester || 'Fall 2026',
       durationMinutes: parseInt(examData.durationMinutes) || 60,
-      totalMarks: parseInt(examData.totalMarks) || 100,
-      passingMarks: parseInt(examData.passingMarks) || 60,
+      totalMarks: autoTotalMarks > 0 ? autoTotalMarks : 100, // Auto-calculated total marks!
+      passingMarks: parseInt(examData.passingMarks) || Math.round((autoTotalMarks || 100) * 0.4),
       startDate: examData.startDate || new Date().toISOString(),
       endDate: examData.endDate || new Date(Date.now() + 86400000 * 7).toISOString(),
       instructions: examData.instructions || 'Standard Proctoring Enabled.',
@@ -56,7 +64,9 @@ export class TeacherService {
       visibility: examData.visibility || 'Public',
       status: examData.status || 'PUBLISHED',
       creator: examData.creator || 'Teacher',
-      questionsCount: 0,
+      questionIds: selectedQuestionIds,
+      questions: attachedQuestions,
+      questionsCount: attachedQuestions.length,
       activeStudents: 0,
       createdAt: new Date().toISOString()
     };
@@ -112,20 +122,28 @@ export class TeacherService {
   }
 
   /**
-   * Add / Author a new question into Question Bank
+   * Add / Author a new question into Question Bank (Objective, MCQ Multi, Subjective, Coding)
    */
   static saveQuestionToBank(questionData) {
     const newQuestion = {
       id: `qb_${Date.now()}`,
-      type: questionData.type || 'MCQ',
-      subject: questionData.subject || 'General',
+      type: questionData.type || 'OBJECTIVE', // OBJECTIVE, MCQ_MULTIPLE, SUBJECTIVE, CODING
+      subject: questionData.subject || 'General CS',
       topic: questionData.topic || 'General',
       difficulty: questionData.difficulty || 'Medium',
       marks: parseInt(questionData.marks) || 10,
       prompt: questionData.prompt || questionData.title || '',
+      
+      // Objective & MCQ Multi
       options: questionData.options || [],
-      correctAnswer: questionData.correctAnswer ?? 0,
+      correctAnswers: questionData.correctAnswers || [0], // array of indices
       explanation: questionData.explanation || '',
+
+      // Subjective fields
+      subjectiveAnswer: questionData.subjectiveAnswer || '',
+      maxWordCount: parseInt(questionData.maxWordCount) || 500,
+
+      // Coding fields
       title: questionData.title || '',
       statement: questionData.statement || '',
       constraints: questionData.constraints || '',
@@ -228,7 +246,6 @@ export class TeacherService {
       s.status
     ]);
 
-    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-    return csvContent;
+    return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
   }
 }
