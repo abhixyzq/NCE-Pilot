@@ -1,5 +1,5 @@
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
@@ -9,8 +9,7 @@ generator client {
 
 enum RoleType {
   STUDENT
-  RECRUITER
-  COLLEGE
+  TEACHER
   ADMIN
 }
 
@@ -34,7 +33,6 @@ enum AttemptStatus {
   IN_PROGRESS
   SUBMITTED
   EXPIRED
-  TERMINATED
 }
 
 enum SubmissionVerdict {
@@ -44,317 +42,124 @@ enum SubmissionVerdict {
   COMPILE_ERROR
   RUNTIME_ERROR
   TIME_LIMIT_EXCEEDED
-  MEMORY_LIMIT_EXCEEDED
-}
-
-model Role {
-  id          String   @id @default(uuid())
-  name        RoleType @unique
-  description String?
-  users       User[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model College {
-  id          String   @id @default(uuid())
-  name        String
-  code        String   @unique
-  domain      String?
-  students    User[]   @relation("CollegeStudents")
-  tests       Test[]   @relation("CollegeTests")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Company {
-  id          String   @id @default(uuid())
-  name        String
-  logoUrl     String?
-  website     String?
-  recruiters  User[]   @relation("CompanyRecruiters")
-  tests       Test[]   @relation("CompanyTests")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model User {
-  id           String    @id @default(uuid())
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
   email        String    @unique
   passwordHash String
   fullName     String
   avatarUrl    String?
-  roleId       String
-  role         Role      @relation(fields: [roleId], references: [id])
+  role         RoleType  @default(STUDENT)
+  collegeName  String?
+  xp           Int       @default(0)
 
-  collegeId String?
-  college   College? @relation("CollegeStudents", fields: [collegeId], references: [id])
+  attempts     TestAttempt[]
+  submissions  CodeSubmission[]
 
-  companyId String?
-  company   Company? @relation("CompanyRecruiters", fields: [companyId], references: [id])
-
-  createdTests       Test[]             @relation("CreatedTests")
-  attempts           TestAttempt[]
-  codeSubmissions    CodeSubmission[]
-  leaderboardEntries LeaderboardEntry[]
-  certificates       Certificate[]
-  notifications      Notification[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([email])
-  @@index([roleId])
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
 
 model Test {
-  id          String     @id @default(uuid())
-  title       String
-  description String?
-  instructions String?   @db.Text
-  status      TestStatus @default(DRAFT)
-  durationMinutes Int    @default(60)
+  id                  String     @id @default(auto()) @map("_id") @db.ObjectId
+  code                String     @unique
+  title               String
+  subject             String
+  department          String?
+  durationMinutes     Int        @default(60)
+  totalMarks          Int        @default(100)
+  passingMarks        Int        @default(60)
+  status              TestStatus @default(PUBLISHED)
+  instructions        String?
 
-  // Proctoring & Control flags
-  enableFullscreen Boolean @default(true)
-  enableWebcam     Boolean @default(false)
-  enableRandomize  Boolean @default(true)
-  enableNegativeMarks Boolean @default(false)
-  negativeMarkRatio Float  @default(0.25)
-  enableMcqSection   Boolean @default(true)
-  enableCodingSection Boolean @default(true)
+  enableFullscreen    Boolean    @default(true)
+  enableRandomize     Boolean    @default(true)
+  enableNegativeMarks Boolean    @default(false)
+  negativeRatio       Float      @default(0.25)
+  autoSubmit          Boolean    @default(true)
 
-  scheduledStart DateTime?
-  scheduledEnd   DateTime?
+  creatorEmail        String
+  questions           Question[]
+  attempts            TestAttempt[]
 
-  creatorId String
-  creator   User   @relation("CreatedTests", fields: [creatorId], references: [id])
-
-  collegeId String?
-  college   College? @relation("CollegeTests", fields: [collegeId], references: [id])
-
-  companyId String?
-  company   Company? @relation("CompanyTests", fields: [companyId], references: [id])
-
-  sections  TestSection[]
-  attempts  TestAttempt[]
-  results   Result[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([status])
-  @@index([creatorId])
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
 }
 
-model TestSection {
-  id          String   @id @default(uuid())
-  testId      String
-  test        Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
-  title       String
-  orderIndex  Int      @default(0)
-  marksWeight Float    @default(1.0)
-  questions   Question[]
+type McqOption {
+  optionText String
+  isCorrect  Boolean @default(false)
+}
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+type TestCase {
+  input          String
+  expectedOutput String
+  isHidden       Boolean @default(false)
+  weight         Int     @default(1)
 }
 
 model Question {
-  id            String       @id @default(uuid())
-  sectionId     String
-  section       TestSection  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  testId        String       @db.ObjectId
+  test          Test         @relation(fields: [testId], references: [id], onDelete: Cascade)
   type          QuestionType
-  prompt        String       @db.Text
-  marks         Float        @default(1.0)
-  negativeMarks Float        @default(0.0)
-  explanation   String?      @db.Text
+  subject       String
+  topic         String?
+  difficulty    String       @default("Medium")
+  prompt        String
+  marks         Int          @default(5)
+  explanation   String?
 
+  // MCQ embedded options
   mcqOptions    McqOption[]
-  codingProblem CodingProblem?
-  responses     QuestionResponse[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // Coding embedded fields & test cases
+  codingTitle   String?
+  statement     String?
+  inputFormat   String?
+  outputFormat  String?
+  constraints   String?
+  timeLimitMs   Int          @default(2000)
+  memoryLimitMb Int          @default(256)
+  testCases     TestCase[]
 
-  @@index([sectionId])
-}
-
-model McqOption {
-  id         String   @id @default(uuid())
-  questionId String
-  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  optionText String
-  isCorrect  Boolean  @default(false)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model CodingProblem {
-  id             String    @id @default(uuid())
-  questionId     String    @unique
-  question       Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  title          String
-  difficulty     String    @default("Medium") // Easy, Medium, Hard
-  inputFormat    String?   @db.Text
-  outputFormat   String?   @db.Text
-  constraints    String?   @db.Text
-  timeLimitMs    Int       @default(2000)
-  memoryLimitMb  Int       @default(256)
-
-  testCases        TestCase[]
-  codeSubmissions  CodeSubmission[]
-  allowedLanguages Language[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Language {
-  id             String          @id @default(uuid())
-  name           String          @unique // e.g. Python, JavaScript, C++, Java
-  judge0Id       Int             @unique // Judge0 language identifier code
-  monacoLang     String
-  templateCode   String          @db.Text
-  codingProblems CodingProblem[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model TestCase {
-  id              String        @id @default(uuid())
-  codingProblemId String
-  codingProblem   CodingProblem @relation(fields: [codingProblemId], references: [id], onDelete: Cascade)
-  input           String        @db.Text
-  expectedOutput  String        @db.Text
-  isHidden        Boolean       @default(true)
-  marks           Float         @default(1.0)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 }
 
 model TestAttempt {
-  id              String        @id @default(uuid())
-  testId          String
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  testId          String        @db.ObjectId
   test            Test          @relation(fields: [testId], references: [id])
-  userId          String
+  userId          String        @db.ObjectId
   user            User          @relation(fields: [userId], references: [id])
   status          AttemptStatus @default(NOT_STARTED)
 
-  startedAt       DateTime?
-  submittedAt     DateTime?
-  timeRemainingSec Int?
+  mcqScore        Float         @default(0)
+  codingScore     Float         @default(0)
+  totalScore      Float         @default(0)
+  accuracy        Float         @default(0)
+  timeTakenSec    Int           @default(0)
 
-  responses       QuestionResponse[]
-  submissions     CodeSubmission[]
-  result          Result?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([testId])
-  @@index([userId])
-}
-
-model QuestionResponse {
-  id          String      @id @default(uuid())
-  attemptId   String
-  attempt     TestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
-  questionId  String
-  question    Question    @relation(fields: [questionId], references: [id])
-
-  selectedOptions String[] // Option IDs for MCQ
-  textAnswer      String?  // For Fill in Blank / True-False
-  isMarkedReview  Boolean  @default(false)
-
-  obtainedMarks Float    @default(0.0)
-  isEvaluated   Boolean  @default(false)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
 
 model CodeSubmission {
-  id              String            @id @default(uuid())
-  attemptId       String
-  attempt         TestAttempt       @relation(fields: [attemptId], references: [id], onDelete: Cascade)
-  userId          String
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String            @db.ObjectId
   user            User              @relation(fields: [userId], references: [id])
-  codingProblemId String
-  codingProblem   CodingProblem     @relation(fields: [codingProblemId], references: [id])
-
+  questionId      String            @db.ObjectId
   language        String
-  sourceCode      String            @db.Text
+  sourceCode      String
   verdict         SubmissionVerdict @default(PENDING)
   executionTimeMs Int?
   memoryUsedKb    Int?
   passedTestCases Int               @default(0)
   totalTestCases  Int               @default(0)
-  obtainedMarks   Float             @default(0.0)
-  compilerOutput  String?           @db.Text
+  obtainedMarks   Float             @default(0)
+  aiSummary       String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([attemptId])
-  @@index([userId])
-}
-
-model Result {
-  id          String      @id @default(uuid())
-  testId      String
-  test        Test        @relation(fields: [testId], references: [id])
-  attemptId   String      @unique
-  attempt     TestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
-
-  mcqScore    Float       @default(0.0)
-  codingScore Float       @default(0.0)
-  totalScore  Float       @default(0.0)
-  maxScore    Float       @default(100.0)
-  accuracy    Float       @default(0.0)
-  timeTakenSec Int        @default(0)
-  passed      Boolean     @default(false)
-  percentile  Float       @default(0.0)
-  rank        Int?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model LeaderboardEntry {
-  id         String   @id @default(uuid())
-  userId     String
-  user       User     @relation(fields: [userId], references: [id])
-  totalXp    Int      @default(0)
-  rank       Int      @default(0)
-  streakDays Int      @default(0)
-
-  updatedAt DateTime @updatedAt
-}
-
-model Certificate {
-  id             String   @id @default(uuid())
-  certificateCode String  @unique
-  userId         String
-  user           User     @relation(fields: [userId], references: [id])
-  title          String
-  issuedAt       DateTime @default(now())
-  downloadUrl    String
-}
-
-model Notification {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  title     String
-  message   String
-  isRead    Boolean  @default(false)
-
-  createdAt DateTime @default(now())
+  createdAt       DateTime          @default(now())
 }
